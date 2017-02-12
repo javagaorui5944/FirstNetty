@@ -3,6 +3,8 @@ package com.gaorui;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.*;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
+import org.jboss.netty.handler.codec.serialization.ClassResolvers;
+import org.jboss.netty.handler.codec.serialization.ObjectDecoder;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
@@ -25,7 +27,8 @@ public class HelloServer {
                     public ChannelPipeline getPipeline()
                             throws Exception {
                         return Channels
-                                .pipeline(new HelloServerHandler());
+                                .pipeline(new HelloServerHandler(),new ObjectDecoder(ClassResolvers.cacheDisabled(this
+                                        .getClass().getClassLoader())),new ObjectServerHandler());
                     }
                 });
         // 开放8000端口供客户端访问。

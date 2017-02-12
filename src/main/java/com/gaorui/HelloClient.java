@@ -1,8 +1,10 @@
 package com.gaorui;
 
+import com.gaorui.pojo.Command;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.*;
 import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
+import org.jboss.netty.handler.codec.serialization.ObjectEncoder;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
@@ -22,7 +24,8 @@ public class HelloClient {
         bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
 //            @Override
             public ChannelPipeline getPipeline() throws Exception {
-                return Channels.pipeline(new HelloClientHandler());
+                return Channels.pipeline(new ObjectEncoder(),
+                       new  HelloClientHandler());
             }
         });
         // 连接到本地的8000端口的服务端
@@ -35,14 +38,19 @@ public class HelloClient {
 
         /**
          * 当绑定到服务端的时候触发，打印"Hello world, I'm client."
-         *
-         * @alia OneCoder
-         * @author lihzh
          */
         @Override
         public void channelConnected(ChannelHandlerContext ctx,
                                      ChannelStateEvent e) {
+
+            sendObject(e.getChannel());
             System.out.println("Hello world, I'm client.");
+        }
+
+        private void sendObject(Channel channel) {
+            Command command = new Command();
+            command.setActionName("Hello action.");
+            channel.write(command);
         }
     }
 }
